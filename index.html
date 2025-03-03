@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Phone Auth</title>
+    
+    <!-- Update to the latest Firebase version -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        #phone-sign-in {
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        input, button {
+            margin: 10px 0;
+            padding: 12px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:disabled {
+            background-color: #cccccc;
+        }
+        #recaptcha-container {
+            margin: 20px 0;
+        }
+        #message {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .error {
+            color: #721c24;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+        }
+        .success {
+            color: #155724;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+        }
+    </style>
+</head>
+<body>
+    <div id="phone-sign-in">
+        <h1>Phone Sign-In</h1>
+        <input type="tel" 
+               id="phone-number" 
+               placeholder="Enter phone number (e.g., +919096839905)" 
+               pattern="^\+[1-9]\d{1,14}$"/>
+        <div id="recaptcha-container"></div>
+        <button id="send-code">Send Verification Code</button>
+        <div id="verification-code-container" style="display: none;">
+            <input type="text" 
+                   id="verification-code" 
+                   placeholder="Enter 6-digit verification code" 
+                   maxlength="6"/>
+            <button id="verify-code">Verify Code</button>
+        </div>
+        <div id="message"></div>
+    </div>
+
+    <script>
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBm3G-PVCKRotrSeSqJIqjyHczsdQ9UJBE",
+            authDomain: "mobile-clone-c05d5.firebaseapp.com",
+            projectId: "mobile-clone-c05d5",
+            storageBucket: "mobile-clone-c05d5.firebasestorage.app",
+            messagingSenderId: "998353325774",
+            appId: "1:998353325774:web:385ff91c36c3e486f38a9f"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Function to show messages
+        function showMessage(message, isError = false) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.className = isError ? 'error' : 'success';
+            messageDiv.innerText = message;
+        }
+
+        // Initialize reCAPTCHA verifier
+        window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+            'size': 'normal',
+            'callback': (response) => {
+                console.log('reCAPTCHA solved');
+                document.getElementById('send-code').disabled = false;
+            },
+            'expired-callback': () => {
+                console.log('reCAPTCHA expired');
+                document.getElementById('send-code').disabled = true;
+                showMessage('reCAPTCHA expired. Please solve it again.', true);
+            }
+        });
+
+        // Render the reCAPTCHA widget
+        window.recaptchaVerifier.render().then(function(widgetId) {
+            window.recaptchaWidgetId = widgetId;
+        });
+
+        // Send verification code
+        document.getElementById('send-code').addEventListener('click', function() {
+            const phoneNumber = document.getElementById('phone-number').value;
+            
+            if (!phoneNumber.match(/^\+[1-9]\d{1,14}$/)) {
+                showMessage('Please enter a valid phone number with country code (e.g., +919096839905)', true);
+                return;
+            }
+
+            this.disabled = true;
+            showMessage('Sending verification code...');
+
+            firebase.auth().signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier)
+                .then((confirmationResult) => {
+                    window.confirmationResult = confirmationResult;
+                    document.getElementById('verification-code-container').style.display = 'block';
+                    showMessage('Verification code sent successfully!');
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    showMessage(error.message, true);
+                    grecaptcha.reset(window.recaptchaWidgetId);
+                    this.disabled = false;
+                });
+        });
+
+        // Verify the code
+        document.getElementById('verify-code').addEventListener('click', function() {
+            const code = document.getElementById('verification-code').value;
+            
+            if (!code.match(/^\d{6}$/)) {
+                showMessage('Please enter a valid 6-digit verification code', true);
+                return;
+            }
+
+            this.disabled = true;
+            showMessage('Verifying code...');
+
+            window.confirmationResult.confirm(code)
+                .then((result) => {
+                    const user = result.user;
+                    showMessage(`Successfully signed in as ${user.phoneNumber}!`);
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    showMessage(error.message, true);
+                    this.disabled = false;
+                });
+        });
+    </script>
+</body>
+</html>
+
