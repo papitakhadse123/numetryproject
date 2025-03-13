@@ -1,0 +1,60 @@
+/* src/ContactForm.css */
+body {
+    background-color: #f0f4f8; /* Light background for the entire page */
+    font-family: 'Arial', sans-serif; /* Set a clean font for the page */
+}
+
+.contact-form {
+    background: linear-gradient(135deg, #ff7e5f, #feb47b); /* Gradient background for the form */
+    padding: 30px; /* Increased padding around the form */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* More pronounced shadow */
+    transition: transform 0.2s; /* Smooth transition for hover effect */
+}
+
+.contact-form:hover {
+    transform: scale(1.02); /* Slightly enlarge the form on hover */
+}
+
+.contact-form h2 {
+    color: #ffffff; /* White color for the heading */
+    margin-bottom: 20px; /* Space below the heading */
+    text-align: center; /* Center the heading */
+}
+
+.contact-form .form-label {
+    font-weight: bold; /* Make labels bold */
+    color: #ffffff; /* White color for labels */
+}
+
+.contact-form .form-control {
+    border: 2px solid #ffffff; /* White border for input fields */
+    border-radius: 5px; /* Rounded corners for input fields */
+    transition: border-color 0.3s; /* Smooth transition for border color */
+}
+
+.contact-form .form-control:focus {
+    border-color: #feb47b; /* Change border color on focus */
+    box-shadow: 0 0 5px rgba(255, 126, 95, 0.5); /* Light shadow on focus */
+}
+
+.contact-form .btn {
+    background-color: #ff6f61; /* Coral color for the button */
+    color: white; /* White text color for the button */
+    width: 100%; /* Full-width button */
+    padding: 12px; /* Padding for the button */
+    border: none; /* Remove border */
+    border-radius: 5px; /* Rounded corners for the button */
+    transition: background-color 0.3s; /* Smooth transition for background color */
+}
+
+.contact-form .btn:hover {
+    background-color: #ff4c3b; /* Darker coral on hover */
+}
+
+.contact-form .alert {
+    margin-top: 15px; /* Space above the alert */
+    background-color: #ffcccb; /* Light red background for error messages */
+    color: #d8000c; /* Dark red text color for error messages */
+    border: 1px solid #d8000c; /* Dark red border for error messages */
+}
